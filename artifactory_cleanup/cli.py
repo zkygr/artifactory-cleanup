@@ -96,12 +96,9 @@ class ArtifactoryCleanupCLI(cli.Application):
     )
 
     _output_artifacts = cli.Flag(
-        "--output-artifacts",
-        help="Save artifacts list to file",
+        "--output-artifacts", help="When --output-format is json, append the a list of all deleted images to --output.",
         mandatory=False,
         default=False,
-        requires=["--output"],
-        envname="ARTIFACTORY_OUTPUT_ARTIFACTS",
     )
 
     @property
@@ -181,6 +178,8 @@ class ArtifactoryCleanupCLI(cli.Application):
             today=today,
             ignore_not_found=self._ignore_not_found,
             worker_count=self._worker_count,
+            output_format=self._output_format,
+            output_artifacts=self._output_artifacts,
         )
 
         # Filter policies by name

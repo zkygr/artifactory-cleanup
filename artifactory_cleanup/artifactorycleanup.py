@@ -6,7 +6,7 @@ from attr import dataclass
 from requests import Session
 
 from artifactory_cleanup.errors import ArtifactoryCleanupException
-from artifactory_cleanup.rules.base import CleanupPolicy, ArtifactDict
+from artifactory_cleanup.rules.base import ArtifactsList, CleanupPolicy, ArtifactDict
 
 
 @dataclass
@@ -14,7 +14,7 @@ class CleanupSummary:
     policy_name: str
     artifacts_removed: int
     artifacts_size: int
-    removed_artifacts_list: Optional[dict] = None
+    removed_artifacts_list: Optional[ArtifactsList] = None
 
 
 class ArtifactoryCleanup:
@@ -26,12 +26,16 @@ class ArtifactoryCleanup:
         today: date,
         ignore_not_found: bool,
         worker_count: int,
+        output_format: str,
+        output_artifacts: bool,
     ):
         self.session = session
         self.policies = policies
         self.destroy = destroy
         self.ignore_not_found = ignore_not_found
         self.worker_count = worker_count
+        self.output_format = output_format
+        self.output_artifacts = output_artifacts,
 
         self._init_policies(today)
 
@@ -39,7 +43,7 @@ class ArtifactoryCleanup:
         for policy in self.policies:
             policy.init(self.session, today)
 
-    def cleanup(self, block_ctx_mgr, test_ctx_mgr) -> Iterator[CleanupSummary]:
+    def cleanup(self, block_ctx_mgr, test_ctx_mgr) -> Iterator[Optional[CleanupSummary]]:
         for policy in self.policies:
             with block_ctx_mgr(policy.name):
                 # Prepare
@@ -78,7 +82,7 @@ class ArtifactoryCleanup:
                     artifacts_size=artifacts_size,
                     artifacts_removed=len(artifacts_to_remove),
                 )
-                if self.save_removed_artifacts_list:
+                if self.output_format == "json" and self.output_artifacts:
                     summary.removed_artifacts_list = artifacts_to_remove
                 yield summary
             except KeyError:
