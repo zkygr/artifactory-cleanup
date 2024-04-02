@@ -1,5 +1,4 @@
-import json
-import os.path
+from concurrent.futures import ThreadPoolExecutor
 from datetime import date
 from typing import List, Iterator, Optional
 
@@ -26,14 +25,13 @@ class ArtifactoryCleanup:
         destroy: bool,
         today: date,
         ignore_not_found: bool,
-        save_removed_artifacts_list: bool,
-
+        worker_count: int,
     ):
         self.session = session
         self.policies = policies
         self.destroy = destroy
         self.ignore_not_found = ignore_not_found
-        self.save_removed_artifacts_list = save_removed_artifacts_list
+        self.worker_count = worker_count
 
         self._init_policies(today)
 
@@ -62,9 +60,13 @@ class ArtifactoryCleanup:
                 print(f"Found {len(artifacts_to_remove)} artifacts AFTER filtering")
 
                 # Delete artifacts
-                for artifact in artifacts_to_remove:
+                def _delete(artifact):
                     with test_ctx_mgr(get_name_for_ci(artifact)):
                         policy.delete(artifact, destroy=self.destroy, ignore_not_found=self.ignore_not_found)
+
+                with ThreadPoolExecutor(max_workers=int(self.worker_count)) as executor:
+                    for artifact in artifacts_to_remove:
+                        executor.submit(_delete, artifact=artifact)
 
             # Show summary
             print(f"Deleted artifacts count: {len(artifacts_to_remove)}")
