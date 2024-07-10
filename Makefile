@@ -5,3 +5,11 @@ copy-examples:
 
 build:
 	 docker build . --file docker/Dockerfile --tag devopshq/artifactory-cleanup
+
+publish-pypi:
+	pipenv run python -m build
+
+	pipenv run twine upload \
+		--repository pypi \
+		--username __token__ \
+		dist/*

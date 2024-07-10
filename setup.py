@@ -11,16 +11,16 @@ this_directory = Path(__file__).parent
 long_description = (this_directory / "README.md").read_text()
 
 setup(
-    name="artifactory-cleanup",
-    version="1.0.10",
+    name="zkygr-artifactory-cleanup",
+    version="1.3.8",
     description="Rules and cleanup policies for Artifactory",
     long_description=long_description,
     long_description_content_type="text/markdown",
     license="MIT",
-    author="Alexey Burov",
-    author_email="allburov@gmail.com",
-    url="https://github.com/devopshq/artifactory-cleanup",
-    keywords=["DevOpsHQ"],
+    author="Kay Gerlitzki",
+    author_email="git@kygr.net",
+    url="https://github.com/zkygr/artifactory-cleanup",
+    keywords=["artifactory", "cleanup"],
     packages=find_packages(exclude=["tests"]),
     entry_points={
         "console_scripts": [
