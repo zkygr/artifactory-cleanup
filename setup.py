@@ -12,7 +12,7 @@ long_description = (this_directory / "README.md").read_text()
 
 setup(
     name="zkygr-artifactory-cleanup",
-    version="1.3.11",
+    version="1.3.12",
     description="Rules and cleanup policies for Artifactory",
     long_description=long_description,
     long_description_content_type="text/markdown",
