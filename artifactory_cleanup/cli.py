@@ -149,7 +149,7 @@ class ArtifactoryCleanupCLI(cli.Application):
         elif format == "json":
             text = json.dumps(result)
 
-        with open(filename, "w") as file:
+        with open(filename, "w", encoding="utf-8") as file:
             file.write(text)
 
     def main(self):
@@ -178,8 +178,6 @@ class ArtifactoryCleanupCLI(cli.Application):
             today=today,
             ignore_not_found=self._ignore_not_found,
             worker_count=self._worker_count,
-            output_format=self._output_format,
-            output_artifacts=self._output_artifacts,
         )
 
         # Filter policies by name
@@ -202,8 +200,8 @@ class ArtifactoryCleanupCLI(cli.Application):
                 "file_count": summary.artifacts_removed,
                 "size": summary.artifacts_size
             }
-            if summary.removed_artifacts_list is not None:
-                policy["artifacts_list"] = summary.removed_artifacts_list
+            if summary.artifacts is not None and self._output_artifacts:
+                policy["artifacts"] = summary.artifacts
             result["policies"].append(policy)
         result["total_size"] = total_size
 
