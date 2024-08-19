@@ -143,11 +143,11 @@ class ArtifactoryCleanupCLI(cli.Application):
         print(self._format_table(result))
 
     def _create_output_file(self, result, filename, format):
-        text = None
+        text = ""
         if format == "table":
             text = self._format_table(result).get_string()
         elif format == "json":
-            text = json.dumps(result)
+            text = json.dumps(result, indent=4)
 
         with open(filename, "w", encoding="utf-8") as file:
             file.write(text)
